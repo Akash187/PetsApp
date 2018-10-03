@@ -1,13 +1,6 @@
 <html>
 <head>
   <title>PetsApp</title>
-
-  <script src="jquery-3.3.1.min.js"></script>
-
-  <script type="text/javascript">
-    // write your JavaScript code here
-  </script>
-
 </head>
 <body>
 <h1>Welcome to PetsApp!</h1>
@@ -21,5 +14,25 @@
 <hr/>
 
 <div id="status"></div>
+
+<script src="jquery-3.3.1.min.js"></script>
+
+<script type="text/javascript">
+  // write your JavaScript code here
+  $(document).ready(() => {
+    console.log("Hello Browser!");
+    $('#allUsersButton').click(() => {
+      $.ajax({
+        url: 'users/',
+        type: 'GET',
+        dataType: 'json',
+        success: (data) => {
+          console.log('ajax success! ', data);
+          $('#status').html('All Users: ' + data);
+        }
+      });
+    });
+  });
+</script>
 </body>
 </html>
