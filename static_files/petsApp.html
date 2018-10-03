@@ -21,6 +21,29 @@
   // write your JavaScript code here
   $(document).ready(() => {
     console.log("Hello Browser!");
+
+    $('#readButton').click(() => {
+      const requestURL = 'users/' + $('#nameBox').val();
+      console.log('make ajax request to:', requestURL);
+      $.ajax({
+        url: requestURL,
+        type: 'GET',
+        dataType: 'json',
+        success: (data) => {
+          console.log('ajax success! ', data);
+          if(data.job && data.pet){
+            $('#status').html("Successfully fetch data at URL: " + requestURL);
+            $('#jobDiv').html('<h1>' + 'My job is : ' + data.job + '</h1>');
+            $('#petImage').attr('src', data.pet).attr('width', '300px');
+          }else{
+            $('#status').html("Error: Could ot find user at URL: " + requestURL);
+            $('#jobDiv').html('');
+            $('#petImage').attr('src', '').attr('width', '');
+          }
+        }
+      });
+    });
+
     $('#allUsersButton').click(() => {
       $.ajax({
         url: 'users/',
@@ -32,6 +55,12 @@
         }
       });
     });
+
+    $(document).ajaxError((err) => {
+      $('#status').html('Error: unknown ajaxError!');
+      console.log(err);
+    });
+
   });
 </script>
 </body>
