@@ -1,29 +1,60 @@
 const express = require('express');
+const sqlite3 = require('sqlite3');
+const bodyParser = require('body-parser');
 const app = express();
 
 app.use(express.static('static_files'));
+app.use(bodyParser.urlencoded({ extended: true }));
 
-const fakeDatabase = {
-  'Philip' : {job: 'professor', pet: 'cat.jpg'},
-  'John' : {job: 'student', pet: 'dog.jpg'},
-  'Carol': {job: 'student', pet: 'bear.jpg'}
-};
+let db = new sqlite3.Database('pets.db', (err) => {
+  if (err) {
+    return console.error(err.message);
+  }
+  console.log('Connected to the in-memory SQlite database.');
+});
 
 app.get('/users', (req, res) => {
   console.log('running app.get /users');
-  const allUserNames = Object.keys(fakeDatabase);
-  res.send(allUserNames);
+  let sql = `SELECT name FROM users_to_pets`;
+  let users = [];
+  db.all(sql, [], (err, rows) => {
+    if (err) {
+      throw err;
+    }
+    rows.forEach((row) => {
+      users.push(row.name);
+    });
+    res.send(users);
+  });
+});
+
+app.post('/user', (req, res) => {
+  db.run('INSERT INTO users_to_pets VALUES ($name, $job, $pet)',
+    {
+      $name: req.body.name,
+      $job: req.body.job,
+      $pet: req.body.pet
+    },
+    (err) => {
+      if(err){
+        res.send("Error in app.post(/user)");
+      }else{
+        res.send("Successfully Saved Data!");
+      }
+    });
 });
 
 app.get('/users/:userid',(req, res) => {
   const nameToLookup = req.params.userid;
-  const val = fakeDatabase[nameToLookup];
-  console.log(`${nameToLookup} -> ${val}`);
-  if(val){
-    res.send(val);
-  }else{
-    res.send({});
-  }
+  let sql = `SELECT * FROM users_to_pets WHERE name = ?`;
+  db.get(sql, [nameToLookup], (err, row) => {
+    if (err) {
+      throw err;
+    }
+    else{
+      res.send(row);
+    }
+  });
 });
 
 app.listen(3000, () => {

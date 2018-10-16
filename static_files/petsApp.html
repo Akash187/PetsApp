@@ -7,16 +7,17 @@
 <label for="nameBox">Name: </label><input id="nameBox" type="text" size="20"/>
 <button id="readButton">Get profile</button>
 <button id="allUsersButton">Get all usernames</button>
-
 <div id="jobDiv"></div>
 <img id="petImage" src="">
-
 <hr/>
-
+<label for="nBox">Name: </label><input id="nBox" type="text" size="20"/>
+<label for="jobBox">Job: </label><input id="jobBox" type="text" size="20"/>
+<label for="petBox">Pet: </label><input id="petBox" type="text" size="20"/>
+<button id="insertButton">Add</button>
+<hr/>
 <div id="status"></div>
 
 <script src="jquery-3.3.1.min.js"></script>
-
 <script type="text/javascript">
   // write your JavaScript code here
   $(document).ready(() => {
@@ -54,6 +55,24 @@
           $('#status').html('All Users: ' + data);
         }
       });
+    });
+
+    $('#insertButton').click(() => {
+      $.ajax({
+        url: '/user',
+        type: 'POST',
+        data: {
+          name: $('#nBox').val(),
+          job: $('#jobBox').val(),
+          pet: $('#petBox').val()
+        },
+        success: (data) => {
+          $('#status').html(data);
+          $('#nBox').html('');
+          $('#jobBox').html('');
+          $('#petBox').html('');
+        }
+      })
     });
 
     $(document).ajaxError((err) => {
